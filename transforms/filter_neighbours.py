@@ -1,5 +1,6 @@
 import torch
 
+
 class FilterNeighbours(object):
     r"""Filters the adjacency matrix and discards neighbours
     that are farther away than the given radius.
@@ -11,7 +12,6 @@ class FilterNeighbours(object):
     def __init__(self, radius):
         self.radius = radius
         return
-
 
     def __call__(self, data):
         mask = torch.nonzero(data.edge_attr[:, 0] <= self.radius)[:, 0]

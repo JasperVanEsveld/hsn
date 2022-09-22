@@ -2,6 +2,7 @@ from .multiscale_radius_graph import MultiscaleRadiusGraph
 from .harmonic_precomp import HarmonicPrecomp
 from .scale_mask import ScaleMask
 from .vector_heat import VectorHeat
+from .vector_heat_cloud import VectorHeatCloud
 from .filter_neighbours import FilterNeighbours
 from .normalize_area import NormalizeArea
 from .subsample import Subsample

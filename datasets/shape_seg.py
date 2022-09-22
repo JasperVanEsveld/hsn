@@ -7,7 +7,8 @@ import progressbar
 import torch
 from torch_geometric.data import InMemoryDataset, extract_zip
 from torch_geometric.io import read_obj, read_ply
-from utils.harmonic import edge_to_vertex_labels 
+from utils.harmonic import edge_to_vertex_labels
+
 
 class ShapeSeg(InMemoryDataset):
     r"""The Shape Segmentation dataset proposed by Maron et al. in
@@ -53,13 +54,14 @@ class ShapeSeg(InMemoryDataset):
         'march1': 25,
         'handstand': 18,
         'march2': 25
-        }
+    }
 
     url = 'https://surfdrive.surf.nl/files/index.php/s/L68uSYpHtfO6dLa'
 
     def __init__(self, root, train=True, transform=None, pre_transform=None,
                  pre_filter=None):
-        super(ShapeSeg, self).__init__(root, transform, pre_transform, pre_filter)
+        super(ShapeSeg, self).__init__(
+            root, transform, pre_transform, pre_filter)
         path = self.processed_paths[0] if train else self.processed_paths[1]
         self.data, self.slices = torch.load(path)
 
@@ -82,7 +84,7 @@ class ShapeSeg(InMemoryDataset):
         shapeseg_path = osp.join(self.raw_dir, 'ShapeSeg')
 
         data_list = []
-        #Adobe
+        # Adobe
         print('Processing Adobe')
         adobe_path = osp.join(shapeseg_path, 'Adobe', 'raw')
         extract_zip(osp.join(adobe_path, 'adobe.zip'), adobe_path)
@@ -99,9 +101,10 @@ class ShapeSeg(InMemoryDataset):
             if hasattr(data, 'sample_idx'):
                 data.y = data.y[data.sample_idx]
             data_list.append(data)
-        torch.save(self.collate(data_list), osp.join(shapeseg_path, 'adobe.pt'))
-            
-        #FAUST
+        torch.save(self.collate(data_list),
+                   osp.join(shapeseg_path, 'adobe.pt'))
+
+        # FAUST
         print('Processing FAUST')
         faust_path = osp.join(shapeseg_path, 'FAUST', 'raw')
         extract_zip(osp.join(faust_path, 'faust.zip'), faust_path)
@@ -118,27 +121,28 @@ class ShapeSeg(InMemoryDataset):
             if hasattr(data, 'sample_idx'):
                 data.y = data.y[data.sample_idx]
             data_list.append(data)
-        torch.save(self.collate(data_list), osp.join(shapeseg_path, 'faust.pt'))
+        torch.save(self.collate(data_list),
+                   osp.join(shapeseg_path, 'faust.pt'))
 
-        #MIT
-        print('Processing MIT')
-        mit_path = osp.join(shapeseg_path, 'MIT', 'raw')
-        extract_zip(osp.join(mit_path, 'mit.zip'), mit_path)
-        mit_meshes = osp.join(mit_path, 'meshes')
-        mit_seg = osp.join(mit_path, 'segs')
-        for filename in progressbar.progressbar(osls(mit_meshes)):
-            data = read_obj(osp.join(mit_meshes, filename))
-            seg_path = osp.join(mit_seg, filename.replace('.obj', '.eseg'))
-            segs = torch.from_numpy(np.loadtxt(seg_path)).long()
-            data.y = edge_to_vertex_labels(data.face, segs, data.num_nodes)
-            if self.pre_filter is not None and not self.pre_filter(data):
-                continue
-            if self.pre_transform is not None:
-                data = self.pre_transform(data)
-            data_list.append(data)
-        torch.save(self.collate(data_list), osp.join(shapeseg_path, 'mit.pt'))
+        # MIT
+        # print('Processing MIT')
+        # mit_path = osp.join(shapeseg_path, 'MIT', 'raw')
+        # extract_zip(osp.join(mit_path, 'mit.zip'), mit_path)
+        # mit_meshes = osp.join(mit_path, 'meshes')
+        # mit_seg = osp.join(mit_path, 'segs')
+        # for filename in progressbar.progressbar(osls(mit_meshes)):
+        #     data = read_obj(osp.join(mit_meshes, filename))
+        #     seg_path = osp.join(mit_seg, filename.replace('.obj', '.eseg'))
+        #     segs = torch.from_numpy(np.loadtxt(seg_path)).long()
+        #     data.y = edge_to_vertex_labels(data.face, segs, data.num_nodes)
+        #     if self.pre_filter is not None and not self.pre_filter(data):
+        #         continue
+        #     if self.pre_transform is not None:
+        #         data = self.pre_transform(data)
+        #     data_list.append(data)
+        # torch.save(self.collate(data_list), osp.join(shapeseg_path, 'mit.pt'))
 
-        #SCAPE
+        # SCAPE
         print('Processing SCAPE')
         scape_path = osp.join(shapeseg_path, 'SCAPE', 'raw')
         extract_zip(osp.join(scape_path, 'scape.zip'), scape_path)
@@ -155,12 +159,13 @@ class ShapeSeg(InMemoryDataset):
             if hasattr(data, 'sample_idx'):
                 data.y = data.y[data.sample_idx]
             data_list.append(data)
-        torch.save(self.collate(data_list), osp.join(shapeseg_path, 'scape.pt'))
+        torch.save(self.collate(data_list),
+                   osp.join(shapeseg_path, 'scape.pt'))
 
         torch.save(self.collate(data_list), self.processed_paths[0])
         data_list = []
 
-        #SHREC
+        # SHREC
         print('Processing SHREC')
         shrec_path = osp.join(shapeseg_path, 'SHREC', 'raw')
         extract_zip(osp.join(shrec_path, 'shrec.zip'), shrec_path)
@@ -179,6 +184,5 @@ class ShapeSeg(InMemoryDataset):
             data_list.append(data)
 
         torch.save(self.collate(data_list), self.processed_paths[1])
-
 
         shutil.rmtree(osp.join(self.raw_dir, 'ShapeSeg'))
